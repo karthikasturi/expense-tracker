@@ -1,0 +1,58 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Transform": "AWS::Serverless-2016-10-31",
+  "Description": "Expense Tracker API Lambda Function",
+  "Globals": {
+    "Function": {
+      "Timeout": 30,
+      "MemorySize": 512,
+      "Runtime": "nodejs20.x"
+    }
+  },
+  "Resources": {
+    "ExpenseTrackerFunction": {
+      "Type": "AWS::Serverless::Function",
+      "Properties": {
+        "CodeUri": "./",
+        "Handler": "src/lambda.handler",
+        "Events": {
+          "RootApi": {
+            "Type": "Api",
+            "Properties": {
+              "Path": "/",
+              "Method": "GET"
+            }
+          },
+          "CreateExpense": {
+            "Type": "Api",
+            "Properties": {
+              "Path": "/api/v1/expenses",
+              "Method": "POST"
+            }
+          },
+          "ProxyApi": {
+            "Type": "Api",
+            "Properties": {
+              "Path": "/{proxy+}",
+              "Method": "ANY"
+            }
+          }
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "ExpenseTrackerApi": {
+      "Description": "API Gateway endpoint URL",
+      "Value": {
+        "Fn::Sub": "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+      }
+    },
+    "ExpenseTrackerFunction": {
+      "Description": "Lambda Function ARN",
+      "Value": {
+        "Fn::GetAtt": ["ExpenseTrackerFunction", "Arn"]
+      }
+    }
+  }
+}
